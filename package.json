@@ -1,6 +1,6 @@
 {
   "name": "woot-crdt",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "WOOT CRDT implementation.",
   "main": "src/index.js",
   "directories": {
