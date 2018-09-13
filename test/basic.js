@@ -207,3 +207,101 @@ test('test randomized operations with delay n=10', function (t) {
     t.end()
   }, 1000)
 })
+
+test('state transfer', function (t) {
+  var nodes = makeNodes(2)
+
+  var w1 = nodes[0] 
+  var w2 = nodes[1] 
+  
+  w1.insert('abc', 0)
+  w2.delete(0, 2)
+  w1.insert('123', 1)
+  w2.replaceRange('m', 0, 2)
+
+  t.equals(w1.value(), w2.value())
+
+  // new node joins
+  var w3 = new Woot('site3', w1.getState())
+  w3.on('operation', (op) => {
+    w2.receive(op)
+    w1.receive(op)
+  })
+  w1.on('operation', (op) => {
+    w3.receive(op)
+  })
+  w2.on('operation', (op) => {
+    w3.receive(op)
+  })
+
+  w1.insert('x', 1)
+  w2.insert('y', 1)
+  w3.insert('z', 1)
+
+  t.equals(w1.value(), w2.value())
+  t.equals(w1.value(), w3.value())
+  
+  t.end()
+})
+
+test('more-than-once delivery', function (t) {
+  var w1 = new Woot('site1')
+  var w2 = new Woot('site2')
+
+  w1.on('operation', (op) => {
+    for (var i=0; i<10; i++) {
+      w2.receive(op)
+    }
+  })
+  w2.on('operation', (op) => {
+    for (var i=0; i<10; i++) {
+      w1.receive(op)
+    }
+  })
+  
+  w1.insert('abc', 0)
+  w2.delete(0, 2)
+  w1.insert('123', 1)
+  w2.replaceRange('m', 0, 2)
+
+  t.equals(w1.value(), w2.value())
+  t.equals(w1.value(), 'm23')
+  t.end()
+})
+
+test('out-of-order delivery', function (t) {
+  var w1 = new Woot('site1')
+  var w2 = new Woot('site2')
+
+  var reverseQueue1 = []
+  w1.on('operation', (op) => {
+    reverseQueue1.push(op)
+    if (reverseQueue1.length > 1) {
+      w2.receive(reverseQueue1.pop())
+    }
+  })
+
+  var reverseQueue2 = []
+  w2.on('operation', (op) => {
+    reverseQueue2.push(op)
+    if (reverseQueue2.length > 1) {
+      w1.receive(reverseQueue1.pop())
+    }
+  })
+  
+  w1.insert('abc', 0)
+  w2.delete(0, 2)
+  w1.insert('123', 1)
+  w2.replaceRange('m', 0, 2)
+
+  // clear queue
+  reverseQueue1.forEach(op => w2.receive(op))
+  reverseQueue2.forEach(op => w1.receive(op))
+
+  console.log(w1._pool.length)
+  console.log(w2._pool.length)
+
+  t.equals(w1.value(), w2.value())
+  t.equals(w1.value(), 'a123bcm')
+  t.end()
+})

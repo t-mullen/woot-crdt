@@ -460,10 +460,11 @@ function WString (site, state) {
 
   self.site = site
   self._clock = 0
+  self._chars = []
   self._pool = []
 
   if (state) {
-    self._chars = new Sequence(state)
+    self.setState(state)
   } else {
     // The "virtual" start and end characters. They use the null siteID
     var startChar = new WChar({
@@ -547,6 +548,8 @@ WString.prototype._insert = function (value, index) {
 
 WString.prototype._integrateInsertion = function ({ id, value, prevId, nextId }) {
   var self = this
+
+  if (self._chars.find(id)) return // more-than-once delivery
 
   self._recursiveIntegrate(
     new WChar({
@@ -663,7 +666,24 @@ WString.prototype.setValue = function (value) {
 
 WString.prototype.getState = function () {
   var self = this
-  return self._chars.elements()
+  return JSON.stringify({
+    chars: self._chars.elements(),
+    pool: self._pool
+  })
+}
+
+WString.prototype.setState = function (state) {
+  var self = this
+
+  var parsed = JSON.parse(state)
+
+  self._chars = new Sequence(parsed.chars.map(x => {
+    x.id = new Identifier(x.id.site, x.id.clock)
+    if (x.prevId) x.prevId = new Identifier(x.prevId.site, x.prevId.clock)
+    if (x.nextId) x.nextId = new Identifier(x.nextId.site, x.nextId.clock)
+    return new WChar(x)
+  }))
+  self._pool = parsed.pool
 }
 
 module.exports = WString
