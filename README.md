@@ -26,6 +26,15 @@ w1.value() // 'abc123'
 w2.value() // 'abc123'
 ```
 
+## install
+```html
+<script src="dist/woot.js>"></script>
+```
+or
+```
+npm install --save woot-crdt
+```
+
 ## api
 ### `var w = new Woot(site, [state])`
 Create a new synchronized sequence.
