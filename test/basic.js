@@ -11,7 +11,7 @@ function makeNodes (n) {
     w1.on('operation', function (op) { 
       nodes.forEach(w2 => {
         if (w2.site !== w1.site) {
-            w2.receive(op)
+            w2.receive(JSON.parse(JSON.stringify(op)))
         }
       })
     })

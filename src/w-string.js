@@ -35,8 +35,17 @@ function WString (site, state) {
   }
 }
 
+function parseOperation (op) {
+  if (op.id) op.id = new Identifier(op.id.site, op.id.clock)
+  if (op.prevId) op.prevId = new Identifier(op.prevId.site, op.prevId.clock)
+  if (op.nextId) op.nextId = new Identifier(op.nextId.site, op.nextId.clock)
+  return op
+}
+
 WString.prototype.receive = function (operation) {
   var self = this
+
+  operation = parseOperation(operation)
 
   if (self._isExecutable(operation)) {
     self._execute(operation)
