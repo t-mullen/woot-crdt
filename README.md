@@ -1,7 +1,7 @@
 # woot-crdt
 Replicate text or sequences over networks.
 
-Allows an unlimited number of authors to collborate on text over networks without many guarantees. (ie gossip networks with more-than-once delivery, out-of-order delivery, and high latency.)
+Allows an unlimited number of authors to collborate in real-time on text over arbitrary networks.
 
 Uses the WOOT CRDT algorithm: https://ieeexplore.ieee.org/document/5158449/
 
