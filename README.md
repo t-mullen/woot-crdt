@@ -1,11 +1,11 @@
 # woot-crdt
+## You should probably use [logoot-crdt](https://github.com/t-mullen/logoot-crdt).
 Replicate text or sequences over networks.
 
 Allows an unlimited number of authors to collborate in real-time on text over arbitrary networks.
 
 Uses the WOOT CRDT algorithm: https://ieeexplore.ieee.org/document/5158449/
 
-You should probably use [logoot-crdt](https://github.com/t-mullen/logoot-crdt).
 
 ## example
 ```javascript
